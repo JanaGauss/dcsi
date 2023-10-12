@@ -4,7 +4,7 @@ Code and data to reproduce the results of the paper
 
 Gauss, J., Scheipl, F., Herrmann, M.: DCSI - An improved measure of cluster separability based on separation and connectedness.
 
-Note that the mnist training data set needs to be downloaded from https://github.com/HerrMo/topoclust and placed in the `data/data_raw` folder. Rerunning all experiments takes several days, even when multiple cores are used, so most results can also be found in the `results` folder.
+Note that some large files need to be downloaded from https://syncandshare.lrz.de/getlink/fiBYc7saoyy1fcaFMeevv/ and placed in the correct folders. Rerunning all experiments takes several days, even when multiple cores are used, so most results can also be found in the results folder.
 
 ## Results on synthetic data sets:
 
@@ -14,7 +14,7 @@ After running all experiments, data frames containing the most important results
 
 ## Results on real-world data sets:
 
-The `code/experiments_rw` folder contains the code to run the experiments on real-world data sets (`experiments_realworld.R` and `fmnist_robustness.R`). The result files can be found in `results/experiments_rw`. The plots and tables are created in `results_realworld_paper.R`.
+The `code/experiments_rw` folder contains the code to run the experiments on real-world data sets (`experiments_realworld.R` and `fmnist_robustness.R`). The result files can be found in `results/experiments_rw`. The plots and tables are created in `results_realworld_paper.R`. Note that the MNIST training data set as well as two result files need to be downloaded from the above mentioned link. 
 
 ## Abstract
 
