@@ -3,3 +3,4 @@
 .RData
 .Ruserdata
 /data/data_raw/mnist_train.csv
+/results/experiments_rw/
