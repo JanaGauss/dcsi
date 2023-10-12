@@ -8,13 +8,13 @@ Note that the mnist training data set needs to be downloaded from https://github
 
 ## Results on synthetic data sets:
 
-The `code/experiments_synthetic` folder contains one file for each of the 9 experiments (`E1_points_dist_var.R` etc.) to run the experiments. For each data set, a rds-file containing all results is saved in `results/experiments_rawData`. These files are not provided here (except for some examples).
+The `code/experiments_synthetic` folder contains one file for each of the 9 experiments (`E1_points_dist_var.R` etc.) to run the experiments. For each data set, an rds-file containing all results is saved in `results/experiments_rawData`. These files are not provided here (except for some examples).
 
 After running all experiments, data frames containing the most important results (one row for each data set) can be reproduced with `read_results.R`. These data frames can also be found in the `results/experiments` folder and are used for the evaluation of the experiments. The plots are created in `results_synth_paper.R`.
 
 ## Results on real-world data sets:
 
-The `code/experiments_rw` folder contains the code to run the experiments on real-world data sets (`experiments_realworld.R` and `fmnist_robustness.R`). The result files can be found in `results/experiments_rw/`. The plots and tables are created in `results_realworld_paper.R`.
+The `code/experiments_rw` folder contains the code to run the experiments on real-world data sets (`experiments_realworld.R` and `fmnist_robustness.R`). The result files can be found in `results/experiments_rw`. The plots and tables are created in `results_realworld_paper.R`.
 
 ## Abstract
 
