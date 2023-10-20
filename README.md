@@ -8,7 +8,7 @@ Note that some large files need to be downloaded from https://syncandshare.lrz.d
 
 ## Results on synthetic data sets:
 
-The `code/experiments_synthetic` folder contains one file for each of the 9 experiments (`E1_points_dist_var.R` etc.) to run the experiments. For each data set, an rds-file containing all results is saved in `results/experiments_rawData`. These files are not provided here (except for some examples).
+The `code/experiments_synthetic` folder contains one file for each of the 9 experiments (`E1_points_dist_var.R` etc.) to run the experiments. For each data set, an rds-file containing all results is saved in `results/experiments_rawData`. These files are not provided here (except for some examples). With the code in `E1_example.R`, you can run the experiment on one exemplary data set.
 
 After running all experiments, data frames containing the most important results (one row for each data set) can be reproduced with `read_results.R`. These data frames can also be found in the `results/experiments` folder and are used for the evaluation of the experiments. The plots are created in `results_synth_paper.R`.
 
