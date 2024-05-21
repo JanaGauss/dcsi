@@ -2,9 +2,9 @@
 
 Code and data to reproduce the results of the paper 
 
-Gauss, J., Scheipl, F., Herrmann, M.: [DCSI - An improved measure of cluster separability based on separation and connectedness](https://arxiv.org/abs/2310.12806).
+DCSI - An improved measure of cluster separability based on separation and connectedness (<https://arxiv.org/abs/2310.12806>)
 
-Note that some large files need to be downloaded from https://syncandshare.lrz.de/getlink/fiBYc7saoyy1fcaFMeevv/ and placed in the correct folders. Rerunning all experiments takes several days, even when multiple cores are used, so most results can also be found in the results folder.
+Note that some large files need to be downloaded from <https://syncandshare.lrz.de/getlink/fiBYc7saoyy1fcaFMeevv/> and placed in the correct folders. Rerunning all experiments takes several days, even when multiple cores are used, so most results can also be found in the results folder.
 
 ## Results on synthetic data sets:
 
