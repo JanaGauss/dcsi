@@ -45,7 +45,7 @@ for(i in 1:length(dat_list)){
 
 saveRDS(results, "results/experiments/results_summary.rds")
 
-#### Figure 9: overview synthetic data sets #######
+#### Figure 12: overview synthetic data sets #######
 E1 <- readRDS("results/experiments/results_E1.rds")
 E2 <- readRDS("results/experiments/results_E2.rds")
 E3 <- readRDS("results/experiments/results_E3.rds")
@@ -147,7 +147,7 @@ plot_dataAll <- plot_grid(
 ggsave("paper/figures/DataApp.pdf", plot_dataAll, width = 8, height = 12)
 
 
-#### Figure 3: boxplots for each experiment #########
+#### Figure 6: boxplots for each experiment #########
 results <- readRDS("results/experiments/results_summary.rds")
 
 dat_cor_2 <- results[, paste0(cols, "_raw")][, -1]
@@ -177,7 +177,7 @@ plot_boxpl <- ggplot(data = dat_long) +
 ggsave("paper/figures/SummPlots0.pdf", plot_boxpl, width = 8, height = 12)
 
 
-#### Figure 4: correlation for each experiment #########
+#### Figure 7: correlation for each experiment #########
 results <- readRDS("results/experiments/results_summary.rds")
 
 dat_cor <- data.frame()
@@ -246,7 +246,7 @@ cor_plot <- heatmap_cor2(dat_cor_1[, -1], size = 2.5) +
 ggsave("paper/figures/cor_synth.pdf", cor_plot, width = 5.3, height = 0.9)
 
 
-#### Figure 10: exemplary embeddings ####
+#### Figure 13: exemplary embeddings ####
 
 x <- readRDS("results/experiments_rawData/E1_572.rds")
 
@@ -263,7 +263,7 @@ pg2 <- plot_grid(p3, p4, nrow = 1)
 plot_grid(pg1, pg2, labels = "AUTO", nrow = 1)
 ggsave("paper/figures/emb_synth.pdf", plot_grid(pg1, pg2, labels = "AUTO", nrow = 1), width = 9, height = 2.3)
 
-#### Figure 11: E9, example ICD and BCD ####
+#### Figure 14: E9, example ICD and BCD ####
 set.seed(1234)
 dat_dim2_1 <- TDA::sphereUnif(500, d = 2, r = 4) # inner sphere
 dat_dim2_2 <- TDA::sphereUnif(500, d = 2, r = 10) # outer sphere
@@ -312,7 +312,7 @@ plot_E9 <- ggplot(dat_all) +
 
 ggsave("paper/figures/plot_E9.pdf", plot_E9, width = 7, height = 1.5)
 
-#### table 4: E4, many irrelevant features ####
+#### table 5: E4, many irrelevant features ####
 library(knitr)
 library(dplyr)
 library(kableExtra)

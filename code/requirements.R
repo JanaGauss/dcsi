@@ -18,6 +18,8 @@ library(gridExtra)
 library(umap)
 library(Rtsne)
 library(dbscan)
+library(cccd)
+library(pegas)
 
 install.packages("remotes")
 remotes::install_github("jlmelville/snedata")

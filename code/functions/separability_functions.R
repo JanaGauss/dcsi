@@ -236,9 +236,7 @@ calc_DCSI <- function(dist, labels, minPts = 5){
     
     
     # Connectedness: maximum distance in a MST built of the core points of cluster i
-    mst_i <- ape::mst(dist_core[ind_i, ind_i])
-    mst_weights <- matrixcalc::hadamard.prod(dist_core[ind_i, ind_i], mst_i)
-    conn_i <- max(mst_weights)
+    conn_i <- max(pegas::mst(dist_core[ind_i, ind_i])[, 3])
     
     
     
@@ -475,9 +473,7 @@ calc_DCSI_RW <- function(dist, labels, minPts = 5){
     
     ind_i <- which(labels_core == i) 
     
-    mst_i <- ape::mst(dist_core[ind_i, ind_i])
-    mst_weights <- matrixcalc::hadamard.prod(dist_core[ind_i, ind_i], mst_i)
-    conn_i <- max(mst_weights)
+    conn_i <- max(pegas::mst(dist_core[ind_i, ind_i])[, 3])
     
     Conn_list <- append(Conn_list, list(conn_i))
     

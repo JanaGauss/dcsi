@@ -1,13 +1,14 @@
 source("code/functions/plot_functions.R")
 library(cowplot)
 library(dplyr)
+library(gridExtra)
 
 
 colors <- c("#000000", "#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "purple")
 measures <- c("DCSI", "DSI", "N2", "calinski_harabasz*")
 
 
-#### MNIST, Figures 12, 6, Table 3 ####
+#### MNIST, Figures 10, 8, Table 4 ####
 dat <- "mnist"
 
 raw <- readRDS(paste0("results/experiments_rw/", dat, "_raw.rds"))
@@ -79,7 +80,7 @@ heatmap_M <- ggplot(data = dat_heatmap) +
         plot.title = element_text(size = 9, hjust = 0.5)) 
 
 
-#### FMNIST-10, Figures 7, 6, Table 3 ####
+#### FMNIST-10, Figures 9, 8, Table 4 ####
 dat <- "fmnist"
 
 raw <- readRDS(paste0("results/experiments_rw/", dat, "_raw.rds"))
@@ -124,9 +125,7 @@ dat_umap$component <- factor(umap$labels_10 - 1)
 
 plot_emb_10 <- plot_2_3d_data(dat_umap, size = 0.1) +
   scale_color_manual(values = colors) +
-  guides(colour = guide_legend("class", nrow = 2, byrow = TRUE, override.aes = list(size=2))) +
-  theme(legend.position = "bottom")
-
+  guides(colour = guide_legend("class", override.aes = list(size=2)))
 
 dat_heatmap_raw <- data.frame()
 dat_heatmap_umap <- data.frame()
@@ -176,7 +175,7 @@ heatmap_10 <- ggplot(data = dat_heatmap) +
         plot.title = element_text(size = 9, hjust = 0.5))
 
 
-#### FMNIST-5, Figures 7, 6, Table 3 ####
+#### FMNIST-5, Figures 9, 8, Table 4 ####
 dat <- "fmnist"
 
 raw <- readRDS(paste0("results/experiments_rw/", dat, "_raw.rds"))
@@ -221,7 +220,7 @@ colnames(table3) <- c("max ARI", measures)
 table3$Data <- rep(c("MNIST", "FMNIST-5", "FMNIST-10"), each = 2)
 table3$Embedding <- rep(c("Raw", "UMAP"), 3)
 table3[, c(6, 7, 1:5)]
-
+# Table 4
 
 
 dat_umap <- umap$dat_vis
@@ -229,8 +228,7 @@ dat_umap$component <- factor(umap$labels_5)
 
 plot_emb_5 <- plot_2_3d_data(dat_umap, size = 0.1) +
   scale_color_manual(values = colors) +
-  guides(colour = guide_legend("class", override.aes = list(size=2), nrow = 2, byrow = TRUE)) +
-  theme(legend.position = "bottom")
+  guides(colour = guide_legend("class", override.aes = list(size=2)))
 
 
 dat_heatmap_raw <- data.frame()
@@ -281,7 +279,9 @@ heatmap_5 <- ggplot(data = dat_heatmap) +
         plot.title = element_text(size = 9, hjust = 0.5)) 
 
 
-plot_fmnist_vis <- plot_grid(plot_emb_10, plot_emb_5)
+plot_fmnist_vis <- plot_grid(plot_emb_10 + theme(plot.margin = unit(c(0.2, 1, 0.2, 0.2), "cm")), 
+                             plot_emb_5 + theme(plot.margin = unit(c(0.2, 0.2, 0.2, 1), "cm")))
+plot_fmnist_vis
 ggsave("paper/figures/fmnist_vis.pdf", plot_fmnist_vis, height = 3, width = 8)
 
 plot_grid(heatmap_M, heatmap_10, heatmap_5, nrow = 3)
@@ -292,7 +292,7 @@ ggsave("paper/figures/heatmap_pair.pdf",
 
 
 
-##### FMNIST-5: robustness, Figure 8 #####
+##### FMNIST-5: robustness, Figure 11 #####
 results_umap_5 <- readRDS("results/experiments_rw/fmnist_robust.rds")
 
 results_umap_5[[1]]$pair_matrix %>% round(., 2) # minPts = 5

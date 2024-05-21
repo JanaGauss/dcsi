@@ -41,7 +41,7 @@ dat_3cluster$component <- c(rep("A", 1000), rep("B", 500))
 
 dat_list <- append(dat_list, list(dat_outlier, dat_moon, dat_circle, dat_random, dat_linsep, dat_3cluster))
 
-#### Figure 2: data sets #####
+#### Figure 4: data sets #####
 plot_list <- lapply(dat_list, plot_2_3d_data, legend = FALSE, size = 0.3, alpha = 0.4)
 p_outlier <- plot_list[[4]]
 dat_outl_2 <- dat_outlier[1001, ]
