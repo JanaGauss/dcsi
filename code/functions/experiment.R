@@ -169,6 +169,161 @@ experiment <- function(params_list){
 } 
 
 
+#' Function to compute DCSI on  synthetic data
+#' 
+#' Generates data, calculates DCSI.
+#' @param params_list list containing all relevant parameters: 
+#' parameter ID: ID of experiment 
+#' parameter seed_data: seed for data generation
+#' parameters for data generation: see generate data or code below. Variables that aren't needed (e.g. r_2 if manif = "point") can be left out
+#' parameter dbscan_rawData: should a DBSCAN clustering for the raw data be calculated?
+#' parameters for DBSCAN: minPts; eps_min, eps_max, eps_by -> they form the epsilon range 
+#' parameter comp_umap: should a umap embedding be computed?
+#' parameters for umap: seed_umap, n_neighbors_umap, n_components_umap
+experiment_Var <- function(params_list){
+  
+  list2env(params_list, globalenv())
+  
+  print(paste(Sys.time(), ID))
+  
+  #### generate data ####
+  set.seed(seed_data)
+  data <- generate_data(n1 = n1, 
+                        n2 = n2, 
+                        manif = manif, 
+                        dist = dist, 
+                        r_2 = r_2, 
+                        r_moon = r_moon, 
+                        dim_sphere = dim_sphere, 
+                        moon_shift = moon_shift,
+                        cov_1 = cov_1, 
+                        cov_2 = cov_2,
+                        dim_noise = dim_noise,
+                        n_irrev_features = n_irrev_features
+  )
+  
+  if(modif_data == TRUE){
+    set.seed(seed_mod)
+    data <- modify_data(data = data, mod_choice = mod_choice, perc = perc)
+  }
+  
+  #### calculate DCSI of raw data ####
+  dist_raw <- proxy::dist(select(data, -component))
+  
+  labels <- factor(data$component)
+  dcsi_raw <- calc_DCSI(dist_raw, labels)
+  
+  results <- list(dcsi_raw = dcsi_raw)
+  
+  #### calculate DBSCAN-clustering of raw data (optional) ####
+  eps_range <- seq(from = eps_min, to = eps_max, by = eps_by)
+  if(dbscan_rawData == TRUE){
+    
+    print(paste(Sys.time(), "dbscan - raw data"))
+    # calculate ARI and NMI for eps_range
+    labels <- data$component
+    if(modif_data == TRUE && mod_choice == "noise"){
+      labels <- labels[1:(n1 + n2)] # choose only "true" data, not noise
+    }
+    
+    if(substr(ID, 1, 2) %in% c("E2", "E7", "E9")){ 
+      # compute ARI, NMI as usual + with each noise point as own cluster
+      res_dbscan_raw <- as.data.frame(cluster_res(dat = dist_raw, eps_range = eps_range, minPts = minPts, 
+                                                  labels = labels, two_versions = TRUE)) 
+      
+      res_dbscan_raw$eps <- eps_range
+      res_dbscan_raw_long <- res_dbscan_raw %>%
+        gather("measure", "performance", c(1, 2, 3, 4))
+      
+      
+    } else{
+      res_dbscan_raw <- as.data.frame(cluster_res(dat = dist_raw, eps_range = eps_range, minPts = minPts, 
+                                                  labels = labels))
+      
+      res_dbscan_raw$eps <- eps_range
+      res_dbscan_raw_long <- res_dbscan_raw %>%
+        gather("measure", "performance", c(1,2))
+    }
+    
+    # find best epsilon and re-compute clustering solution
+    eps_dbscan_raw <- res_dbscan_raw_long$eps[which.max(res_dbscan_raw_long$performance)]
+    dbscan_raw <- dbscan::dbscan(x = dist_raw, eps = eps_dbscan_raw, minPts = minPts)
+    
+    results <- append(results,
+                      list(res_dbscan_raw_long = res_dbscan_raw_long,
+                           eps_dbscan_raw = eps_dbscan_raw,
+                           dbscan_raw = dbscan_raw))
+    print(paste(Sys.time(), "dbscan - raw data - done"))
+  }
+  
+  #### calculate UMAP embedding and evaluate it ####
+  if(comp_umap == TRUE){
+    
+    umap_emb <- umap::umap(as.matrix(dist_raw), random_state = seed_umap, 
+                           n_neighbors = n_neighbors_umap, n_components = n_components_umap, input = "dist")
+    
+    dat_umap <- as.data.frame(umap_emb$layout)
+    colnames(dat_umap) <- paste0("X", 1:ncol(dat_umap))
+    dat_umap$component <- data$component
+    
+    dist_umap <- proxy::dist(select(dat_umap, -component))
+    
+    #### calculate DCSI ####
+    labels <- factor(dat_umap$component)
+    dcsi_raw <- calc_DCSI(dist_umap, labels)
+    
+    results <- append(results,
+                      list(dcsi_umap = dcsi_umap))
+    
+    
+    #### calculate DBSCAN-clustering of umap embedding ####
+    print(paste(Sys.time(), "dbscan - umap embedding"))
+    # calculate ARI and NMI for eps_range
+    labels <- data$component
+    if(modif_data == TRUE && mod_choice == "noise"){
+      labels <- labels[1:(n1 + n2)] # choose only "true" data, not noise
+    }
+    
+    if(substr(ID, 1, 2) %in% c("E2", "E7", "E9")){ 
+      # compute ARI, NMI as usual + with each noise point as own cluster
+      res_dbscan_umap <- as.data.frame(cluster_res(dat = dist_umap, eps_range = eps_range, minPts = minPts, 
+                                                   labels = labels, two_versions = TRUE)) 
+      
+      res_dbscan_umap$eps <- eps_range
+      res_dbscan_umap_long <- res_dbscan_umap %>%
+        gather("measure", "performance", c(1,2,3,4))
+      
+      
+    } else{
+      res_dbscan_umap <- as.data.frame(cluster_res(dat = dist_umap, eps_range = eps_range, minPts = minPts, 
+                                                   labels = labels))
+      
+      res_dbscan_umap$eps <- eps_range
+      res_dbscan_umap_long <- res_dbscan_umap %>%
+        gather("measure", "performance", c(1,2))
+    }
+    
+    # find best epsilon and re-compute clustering solution
+    eps_dbscan_umap <- res_dbscan_umap_long$eps[which.max(res_dbscan_umap_long$performance)]
+    dbscan_umap <- dbscan::dbscan(x = dist_umap, eps = eps_dbscan_umap, minPts = minPts)
+    
+    results <- append(results,
+                      list(dat_umap = dat_umap,
+                           dist_umap = dist_umap,
+                           res_dbscan_umap_long = res_dbscan_umap_long,
+                           eps_dbscan_umap = eps_dbscan_umap,
+                           dbscan_umap = dbscan_umap))
+    print(paste(Sys.time(), "dbscan - umap emb. - done"))
+    
+  }
+  
+  # return(results)
+  saveRDS(results, file = paste0("results/experiments_rawData_Var/", ID, ".rds"))
+  
+  
+} 
+
+
 
 cluster_res <- function(dat, eps_range, minPts, labels, two_versions = FALSE) { 
   

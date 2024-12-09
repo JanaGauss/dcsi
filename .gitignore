@@ -5,3 +5,4 @@
 /data/data_raw/mnist_train.csv
 /results/experiments_rw/mnist_umap.rds
 /results/experiments_rw/fmnist_umap.rds
+/results/experiments_rawData_Var
