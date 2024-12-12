@@ -4,6 +4,7 @@ source("code/functions/generate_data.R")
 # read results
 
 library(dplyr)
+library(tidyr)
 library(stringr)
 library(ggplot2)
 library(cowplot)
@@ -27,6 +28,7 @@ readResults <- function(filenames){
     res <- c(as.numeric(id), 
              dist = row_params$dist,
              cov = row_params$cov_1,
+             maxARI = max(filter(list$res_dbscan_raw_long, measure == "ARI")$performance),
              dcsi = list$dcsi_raw$DCSI,
              Sep = list$dcsi_raw$Sep_DCSI,
              Conn = list$dcsi_raw$Conn_DCSI)
@@ -34,7 +36,7 @@ readResults <- function(filenames){
     results <- rbind(results, res)
   }
   
-  colnames(results) <- c("ID", "dist", "cov", "dcsi", "Sep", "Conn")
+  colnames(results) <- c("ID", "dist", "cov", "maxARI", "dcsi", "Sep", "Conn")
   
   results <- results %>%
     mutate_all(as.character) %>%
@@ -53,7 +55,22 @@ result$sd <- sqrt(result$cov)
 
 # plot results
 ggplot(data = result) + geom_boxplot(aes(x = factor(sd),y = dcsi))
+ggplot(data = result) + geom_boxplot(aes(x = factor(sd),y = maxARI))
 
+# correlation dcsi and ARI
+cor(result$maxARI, result$dcsi, method = "spearman")
+
+result %>% group_by(cov) %>% summarise(cor_cov = cor(dcsi, maxARI, method = "spearman"))
+
+result_long <- result %>% gather("measure", "value", 4:5)
+
+ggplot(data = result_long) + geom_boxplot(aes(x = factor(sd), y = value, fill = measure))
+
+ggplot(data = result_long, aes(x = measure, y = value, group = ID)) + 
+  geom_line(alpha = 0.2) +
+  geom_point(aes(col = factor(sd)), position = position_jitter(width = 0.05), size = 0.5) + theme_bw()
+# improve color palette
+   
 # plot some data sets
 set.seed(96315)
 sds <-seq(from = 0.5, to = 2, by = 0.25)

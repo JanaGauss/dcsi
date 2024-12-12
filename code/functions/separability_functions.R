@@ -424,11 +424,11 @@ calc_CVIs_Compl <- function(data, dist, labels, name_value = "value"){
 #' @param dist a distance matrix
 #' @param labels a vector with labels
 #' @param minPts minPts argument for core point definition
-calc_DCSI_RW <- function(dist, labels, minPts = 5){
+calc_DCSI_RW <- function(dist, labels, minPts = 5, returnSepConn = FALSE){
   
   dist <- as.matrix(dist)
   
-  labels_numeric <- as.numeric(labels)
+  labels_numeric <- labels <- as.numeric(labels)
   
   # compute core points: 
   # calculate eps for each class = median distance to minPts*2-th = k-th neighbor
@@ -469,7 +469,7 @@ calc_DCSI_RW <- function(dist, labels, minPts = 5){
   # connectedness = maximum distance in a MST built of the core points of cluster i
   Conn_list <- list()
   Sep_matrix <- matrix(0, nrow = max(as.numeric(labels_core)), ncol = max(as.numeric(labels_core)))
-  for(i in unique(labels_core)){
+  for(i in 1:max(as.numeric(labels_core))){
     
     ind_i <- which(labels_core == i) 
     
@@ -477,13 +477,13 @@ calc_DCSI_RW <- function(dist, labels, minPts = 5){
     
     Conn_list <- append(Conn_list, list(conn_i))
     
-    for(j in i:max(as.numeric(labels_core))){
+    for(j in 1:max(as.numeric(labels_core))){
       if(i != j){
         
         ind_j <- which(labels_core == j)
         
         dist_ij <- dist_core[ind_i, ind_j]
-        Sep_matrix[as.numeric(i), j] <- min(dist_ij)
+        Sep_matrix[i, j] <- min(dist_ij)
         
       }
       
@@ -497,15 +497,15 @@ calc_DCSI_RW <- function(dist, labels, minPts = 5){
   # calculate pairwise DCSIs
   dcsi_matrix <- matrix(0, nrow = max(labels_numeric), ncol = max(labels_numeric))
   
-  for(i in unique(labels_core)){
+  for(i in 1:max(as.numeric(labels_core))){
     
     for(j in i:max(as.numeric(labels_core))){
       if(i != j){
         
-        Sep <- Sep_matrix[as.numeric(i), j]
+        Sep <- Sep_matrix[i, j]
         Conn <- max(Conn_list[[i]], Conn_list[[j]])
         
-        dcsi_matrix[as.numeric(i), j] <- (Sep/Conn)/(1+Sep/Conn)
+        dcsi_matrix[i, j] <- (Sep/Conn)/(1+Sep/Conn)
         
       }
       
@@ -525,11 +525,16 @@ calc_DCSI_RW <- function(dist, labels, minPts = 5){
   DCSI <- (Sep/Conn)/(1+Sep/Conn) # = 1/(1+Conn/Sep)
   
   result <- list("all" = DCSI, "pair_matrix" = dcsi_matrix)
+  if(returnSepConn){
+    result <- list("all" = DCSI, "pair_matrix" = dcsi_matrix,
+                   Sep = Sep_matrix, Conn = Conn_list)
+  }
   
   # return result
   return(result)
   
 }
+
 
 # calculate DCSI with different values of min_Pts
 calc_sep_RW_robust <- function(data, dist = NULL, labels, 
@@ -542,13 +547,12 @@ calc_sep_RW_robust <- function(data, dist = NULL, labels,
   }
   
   dist <- as.matrix(dist)
-  labels <- factor(labels)
   labels_numeric <- as.numeric(labels)
   
   # calculate DCSI
   for(j in min_Pts){
     print(paste0("min_Pts = ", j))
-    dcsi <- calc_DCSI_RW(dist, labels, minPts = j) # uses precomputed results, e.g. the MSTs only have to be calculated once
+    dcsi <- calc_DCSI_RW(dist, labels, minPts = j) 
     dcsi <- append(dcsi, list(min_Pts = j))
     
     results[[length(results) + 1]] <- dcsi
@@ -559,3 +563,23 @@ calc_sep_RW_robust <- function(data, dist = NULL, labels,
 }
 
 
+calc_DCSI_multiclass <- function(Sep_matrix, Conn_list, pair_matrix){
+  
+  Conn <- unlist(Conn_list)
+  
+  
+  # Group 1: mean, median and min of pairwise dcsi
+  result <- c(mean(pair_matrix, na.rm = TRUE), 
+              median(pair_matrix, na.rm = TRUE),
+              min(pair_matrix, na.rm = TRUE))
+  
+  # Group 2: min Sep/max Conn, mean Sep/mean Conn, median Sep/median Conn
+  result <- c(result, c((mean(Sep_matrix, na.rm = TRUE)/mean(Conn))/(1+mean(Sep_matrix, na.rm = TRUE)/mean(Conn)),
+                        (median(Sep_matrix, na.rm = TRUE)/median(Conn))/(1+median(Sep_matrix, na.rm = TRUE)/median(Conn)),
+                        (min(Sep_matrix, na.rm = TRUE)/max(Conn))/(1+min(Sep_matrix, na.rm = TRUE)/max(Conn))))
+        
+  names(result) <- c("G1_mean", "G1_median", "G1_min", 
+                     "G2_mean", "G2_median", "G2_minmax")      
+  result
+  
+}
