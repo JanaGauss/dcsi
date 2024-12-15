@@ -62,7 +62,8 @@ cor(result$maxARI, result$dcsi, method = "spearman")
 
 result %>% group_by(cov) %>% summarise(cor_cov = cor(dcsi, maxARI, method = "spearman"))
 
-result_long <- result %>% gather("measure", "value", 4:5)
+result$DCSI <- result$dcsi
+result_long <- result %>% gather("measure", "value", c("maxARI", "DCSI"))
 
 ggplot(data = result_long) + geom_boxplot(aes(x = factor(sd), y = value, fill = measure))
 
@@ -70,8 +71,10 @@ ggplot(data = result_long, aes(x = measure, y = value, group = ID)) +
   geom_line(alpha = 0.2) +
   geom_point(aes(col = factor(sd)), position = position_jitter(width = 0.05), size = 0.5) + theme_bw()
 # improve color palette
+
+ggplot(data = result_long, aes(x = factor(sd), y = value)) + geom_boxplot() +
+  facet_wrap(~measure) + theme_bw() + labs(x = "standard deviation")
    
-# plot some data sets
 set.seed(96315)
 sds <-seq(from = 0.5, to = 2, by = 0.25)
 plot_list <- list()

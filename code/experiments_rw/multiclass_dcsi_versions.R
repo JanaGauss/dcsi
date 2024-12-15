@@ -30,6 +30,8 @@ res_multiclass <- data.frame(fmnist5 = calc_DCSI_multiclass(fmnist_5$Sep,
                              mnist = calc_DCSI_multiclass(mnist$Sep, 
                                                           mnist$Conn, mnist$pair_matrix))
 res_multiclass %>% round(2)
+library(xtable)
+xtable(res_multiclass %>% round(2), type = "latex")
 
 # Group 1:
 # mean of pairwise DCSI
