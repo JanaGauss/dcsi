@@ -4,8 +4,6 @@ source("code/functions/experiment.R")
 # distance of means: 4.5
 # standard deviation: 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2
 
-# ToDo: add dbscan clustering
-
 dist_means <- 4.5
 n_MCsamples <- 200
 sds <- seq(from = 0.5, to = 2, by = 0.25)

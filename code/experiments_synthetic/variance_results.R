@@ -70,16 +70,22 @@ ggplot(data = result_long) + geom_boxplot(aes(x = factor(sd), y = value, fill = 
 ggplot(data = result_long, aes(x = measure, y = value, group = ID)) + 
   geom_line(alpha = 0.2) +
   geom_point(aes(col = factor(sd)), position = position_jitter(width = 0.05), size = 0.5) + theme_bw()
-# improve color palette
 
-ggplot(data = result_long, aes(x = factor(sd), y = value)) + geom_boxplot() +
+plot_res <- ggplot(data = result_long, aes(x = factor(sd), y = value)) + geom_boxplot() +
   facet_wrap(~measure) + theme_bw() + labs(x = "standard deviation")
-   
+plot_res
+ggsave("paper/figures/var_boxplots.pdf", plot_res, width = 5, height = 2.5)
+
+
 set.seed(96315)
-sds <-seq(from = 0.5, to = 2, by = 0.25)
-plot_list <- list()
+sds <-seq(from = 0.5, to = 1.75, by = 0.25)
+dat_all <- data.frame()
 for(sd in sds){
-  plot_list[[length(plot_list) + 1]] <- plot_2_3d_data(generate_data(dist = 4.5, cov_1 = sd^2, cov_2 = sd^2)) + 
-    guides(color = "none") + labs(title = paste0("SD = ", sd))
+  dat_all <- rbind(dat_all, generate_data(dist = 4.5, cov_1 = sd^2, cov_2 = sd^2))
+  
 }
-plot_grid(plotlist = plot_list, nrow = 2)
+dat_all$SD <- rep(sds, each = 1000)
+dat_all$SD <- paste0("SD = ", dat_all$SD)
+plot_dat_var <- plot_2_3d_data(dat_all, alpha = 0.3, size = 0.3) + facet_wrap(~SD) + guides(color = "none") 
+plot_dat_var
+ggsave("paper/figures/dat_var.pdf", plot_dat_var, width = 4, height = 2.5)
